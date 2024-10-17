@@ -116,6 +116,11 @@ def remote_control():
 
 rc_auto_loop = Thread(remote_control)
 
+def auton() :
+    global drivetrain
+    drivetrain.drive(FORWARD,400, VelocityUnits.RPM)
+    wait(2,TimeUnits.SECONDS)
+    
 
 # def startup_brain():
 #     skills = [20 + 130 + 170 + 20, 170, 100, 50]
