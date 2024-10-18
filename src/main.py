@@ -20,6 +20,7 @@ drivetrain = DriveTrain(drive_left, drive_right, 339.1, 350, 230, MM)
 
 
 intake = Motor(Ports.PORT14)
+intake.set_velocity(90, VelocityUnits.PERCENT)
 
 grabber1 = DigitalOut(brain.three_wire_port.a)
 grabber2 = DigitalOut(brain.three_wire_port.b)
@@ -28,7 +29,7 @@ grabber1.set(isGrabbing)
 grabber2.set(isGrabbing)
 
 conveyor = Motor(Ports.PORT12, GearSetting.RATIO_6_1, False)
-conveyor.set_velocity(75,VelocityUnits.PERCENT)
+conveyor.set_velocity(90,VelocityUnits.PERCENT)
 conveyorOn = False
 
 wait(30, MSEC)
@@ -36,7 +37,7 @@ wait(30, MSEC)
 # define variables used for controlling motors based on controller inputs
 left_to_be_stopped = False
 right_to_be_stopped = False
-intake_is_stopped = True
+intake_is_stopped = False
 
 
 def remote_control():
@@ -81,17 +82,35 @@ def remote_control():
             drive_right.set_velocity(drivetrain_right_speed, PERCENT)
             drive_right.spin(FORWARD)
 
-        if controller_1.buttonR1.pressing():
-            intake.spin(FORWARD)
-            intake_is_stopped = False
-        elif controller_1.buttonR2.pressing():
+        # if controller_1.buttonR1.pressing():
+        #     intake.spin(FORWARD)
+        #     intake_is_stopped = False
+        # elif controller_1.buttonR2.pressing():
+        #     intake.spin(REVERSE)
+        #     intake_is_stopped = False
+        # elif not intake_is_stopped:
+        #     intake.stop()
+        #     # set the toggle so that we don't constantly tell the motor to stop when
+        #     # the buttons are released
+        #     intake_is_stopped = True
+
+
+            
+        if controller_1.buttonR2.pressing() :
+             
+            intake_is_stopped = not intake_is_stopped
+            while controller_1.buttonR2.pressing() :
+                pass
+
+        if intake_is_stopped :
             intake.spin(REVERSE)
-            intake_is_stopped = False
-        elif not intake_is_stopped:
+        else: 
             intake.stop()
-            # set the toggle so that we don't constantly tell the motor to stop when
-            # the buttons are released
-            intake_is_stopped = True
+
+        if conveyorOn :
+            conveyor.spin(FORWARD)
+        else :
+            conveyor.stop()
         if controller_1.buttonL2.pressing() :
              
             conveyorOn = not conveyorOn
@@ -112,6 +131,7 @@ def remote_control():
         # Wait for the button to be released to avoid rapid toggling
             while controller_1.buttonA.pressing():
                 pass
+       
         
 
 rc_auto_loop = Thread(remote_control)
@@ -120,6 +140,7 @@ def auton() :
     global drivetrain
     drivetrain.drive(FORWARD,400, VelocityUnits.RPM)
     wait(2,TimeUnits.SECONDS)
+    drivetrain.stop
     
 
 # def startup_brain():
