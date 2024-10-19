@@ -39,11 +39,40 @@ left_to_be_stopped = False
 right_to_be_stopped = False
 intake_is_stopped = False
 
+def pre_autonomous():
+    pass
 
-def remote_control():
+def autonomous():
+    global drivetrain, drive_left, drive_right
+    drive_left.set_velocity(75, VelocityUnits.PERCENT)
+    drive_left.spin(FORWARD)
+    wait(.5, TimeUnits.SECONDS)
+    drive_right.set_velocity(75, VelocityUnits.PERCENT)
+
+    drive_left.spin(FORWARD)
+    drive_right.spin(FORWARD)
+
+   
+    wait(.5,TimeUnits.SECONDS)
+
+    drive_left.set_velocity(0, VelocityUnits.PERCENT)
+    drive_right.set_velocity(0, VelocityUnits.PERCENT)
+
+
+    
+
+
+
+def user_control():
     
     global left_to_be_stopped, right_to_be_stopped, intake_is_stopped, conveyorOn, isGrabbing
     while True:
+        # x_joystick = controller_1.axis1
+        # y_joystick = controller_1.axis2
+
+        # left_m = y_joystick + x_joystick
+        # right_m = y_joystick - x_joystick
+     
 
         drivetrain_left_speed = controller_1.axis4.position() * 0.75 - controller_1.axis2.position()
         drivetrain_right_speed = controller_1.axis4.position() * 0.75 + controller_1.axis2.position()
@@ -82,19 +111,7 @@ def remote_control():
             drive_right.set_velocity(drivetrain_right_speed, PERCENT)
             drive_right.spin(FORWARD)
 
-        # if controller_1.buttonR1.pressing():
-        #     intake.spin(FORWARD)
-        #     intake_is_stopped = False
-        # elif controller_1.buttonR2.pressing():
-        #     intake.spin(REVERSE)
-        #     intake_is_stopped = False
-        # elif not intake_is_stopped:
-        #     intake.stop()
-        #     # set the toggle so that we don't constantly tell the motor to stop when
-        #     # the buttons are released
-        #     intake_is_stopped = True
-
-
+     
             
         if controller_1.buttonR2.pressing() :
              
@@ -134,13 +151,11 @@ def remote_control():
        
         
 
-rc_auto_loop = Thread(remote_control)
+# rc_auto_loop = Thread(user_control)
+comp = Competition(user_control, autonomous)
+pre_autonomous()
 
-def auton() :
-    global drivetrain
-    drivetrain.drive(FORWARD,400, VelocityUnits.RPM)
-    wait(2,TimeUnits.SECONDS)
-    drivetrain.stop
+    
     
 
 # def startup_brain():
